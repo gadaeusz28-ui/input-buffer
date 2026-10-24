@@ -20,12 +20,11 @@ static bool isCube(PlayerObject* p) {
 
 class $modify(BufferGJBGL, GJBaseGameLayer) {
 	struct Fields {
-		bool pending[2] = {false, false};   // czy puszczenie przycisku jest opoznione
-		int timer[2] = {0, 0};              // ile krokow zostalo w oknie
-		int groundSteps[2] = {0, 0};        // ile krokow gracz juz stoi na ziemi
+		bool pending[2] = {false, false};
+		int timer[2] = {0, 0};
+		int groundSteps[2] = {0, 0};
 	};
 
-	// Przechwytujemy przycisk skoku (button == 1).
 	void handleButton(bool down, int button, bool isPlayer1) {
 		int window = getWindow();
 		if (window <= 0 || button != 1) {
@@ -38,7 +37,6 @@ class $modify(BufferGJBGL, GJBaseGameLayer) {
 		auto* player = isPlayer1 ? m_player1 : m_player2;
 
 		if (down) {
-			// Nowe klikniecie, gdy poprzednie puszczenie czekalo: zrob swieze puszczenie + wcisniecie.
 			if (f->pending[i]) {
 				f->pending[i] = false;
 				f->groundSteps[i] = 0;
@@ -48,19 +46,17 @@ class $modify(BufferGJBGL, GJBaseGameLayer) {
 			return;
 		}
 
-		// Puszczenie przycisku w powietrzu (kostka) -> opoznij je.
 		if (player && isCube(player) && !player->m_isOnGround) {
 			f->pending[i] = true;
 			f->timer[i] = window;
 			f->groundSteps[i] = 0;
-			return; // polykamy puszczenie, gra dalej "trzyma" przycisk
+			return;
 		}
 
 		GJBaseGameLayer::handleButton(false, button, isPlayer1);
 	}
 
-	// Kazde wywolanie = jeden krok fizyki.
-	void processCommands(float dt) {
+	void processCommands(float dt, bool isHalfTick, bool isLastTick) {
 		auto f = m_fields.self();
 		for (int i = 0; i < 2; ++i) {
 			if (!f->pending[i]) continue;
@@ -75,15 +71,13 @@ class $modify(BufferGJBGL, GJBaseGameLayer) {
 			if (player->m_isOnGround) f->groundSteps[i]++;
 			f->timer[i]--;
 
-			// Po ladowaniu dajemy 2 kroki na odpalenie skoku, potem puszczamy.
-			// Albo okno sie skonczylo.
 			if (f->groundSteps[i] >= 2 || f->timer[i] <= 0) {
 				f->pending[i] = false;
 				f->groundSteps[i] = 0;
 				GJBaseGameLayer::handleButton(false, 1, i == 0);
 			}
 		}
-		GJBaseGameLayer::processCommands(dt);
+		GJBaseGameLayer::processCommands(dt, isHalfTick, isLastTick);
 	}
 };
 
