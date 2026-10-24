@@ -1,0 +1,22 @@
+{
+	"geode": "4.6.0",
+	"gd": {
+		"win": "2.2074",
+		"android": "2.2074",
+		"mac": "2.2074",
+		"ios": "2.2074"
+	},
+	"id": "twojnick.input-buffer",
+	"name": "Input Buffer",
+	"version": "v1.0.0",
+	"developer": "twojnick",
+	"description": "Buforuje puszczenie przycisku, zeby skok odpalil sie zaraz po wylądowaniu. F5 przelacza okno: OFF / 4 / 8 / 16 krokow.",
+	"settings": {
+		"cycle-key": {
+			"type": "keybind",
+			"name": "Klawisz przełączania okna",
+			"description": "Przełącza okno bufora: OFF, 4, 8, 16 kroków.",
+			"default": "F5"
+		}
+	}
+}
